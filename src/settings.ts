@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Power BI Visualizations
  *
  *  Copyright (c) Microsoft Corporation
@@ -348,10 +348,31 @@ export class DisplaySettingsCard extends FormattingSettingsSimpleCard {
         value: axisBeginningOptions[0],
     });
 
+    // Add these new settings for static axis scaling
+    useStaticScale = new formattingSettings.ToggleSwitch({
+        name: "useStaticScale",
+        displayNameKey: "Visual_UseStaticScale",
+        displayName: "Use fixed axis scale",
+        value: false
+    });
+
+    staticMaxValue = new formattingSettings.NumUpDown({
+        name: "staticMaxValue",
+        displayNameKey: "Visual_StaticMaxValue",
+        displayName: "Maximum axis value",
+        value: 100,
+        options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: 0
+            }
+        }
+    });
+
     name: string = RadarChartObjectNames.DisplaySettings;
     displayName: string = "Display settings";
     displayNameKey: string = "Visual_DisplaySettings";
-    slices: FormattingSettingsSlice[] = [this.minValue, this.axisBeginning];
+    slices: FormattingSettingsSlice[] = [this.minValue, this.axisBeginning, this.useStaticScale, this.staticMaxValue];
 }
 
 export class LabelsSettingsCard extends BaseFontCardSettings {
