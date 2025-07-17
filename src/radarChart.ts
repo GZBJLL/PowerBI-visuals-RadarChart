@@ -1513,29 +1513,39 @@ export class RadarChart implements IVisual {
         return `${tooltipInfo[0].displayName}:${tooltipInfo[0].value}-${tooltipInfo[1].displayName}:${tooltipInfo[1].value}`;
     }
 
-    private calculateChartDomain(series: RadarChartSeries[]): d3LinearScale<number, number> {
-        const radius: number = this.radius * RadarChart.SegmentFactor,
-            dataPointsList: RadarChartDatapoint[] = this.getAllDataPointsList(series);
+private calculateChartDomain(series: RadarChartSeries[]): d3LinearScale<number, number> {
+    const radius: number = this.radius * RadarChart.SegmentFactor;
+    const dataPointsList: RadarChartDatapoint[] = this.getAllDataPointsList(series);
 
-        let maxValue: number = d3Max(dataPointsList, (dataPoint: RadarChartDatapoint) => {
+    let maxValue: number;
+    
+    // Check if static scale is enabled
+    if (this.formattingSettings.display.useStaticScale.value) {
+        // Use the user-defined static max value
+        maxValue = this.formattingSettings.display.staticMaxValue.value;
+    } else {
+        // Calculate max value from data
+        maxValue = d3Max(dataPointsList, (dataPoint: RadarChartDatapoint) => {
             return dataPoint.y;
         });
-
-        let minValue: number = this.formattingSettings.display.minValue.value;
-
-        if (this.isPercentChart(dataPointsList)) {
-            minValue = minValue >= RadarChart.MinDomainValue
-                ? RadarChart.MinDomainValue
-                : -RadarChart.MaxDomainValue;
-
-            maxValue = maxValue <= RadarChart.MinDomainValue
-                ? RadarChart.MinDomainValue
-                : RadarChart.MaxDomainValue;
-        }
-        return d3ScaleLinear()
-            .domain([minValue, maxValue])
-            .range([RadarChart.MinDomainValue, radius]);
     }
+
+    let minValue: number = this.formattingSettings.display.minValue.value;
+
+    if (this.isPercentChart(dataPointsList) && !this.formattingSettings.display.useStaticScale.value) {
+        minValue = minValue >= RadarChart.MinDomainValue
+            ? RadarChart.MinDomainValue
+            : -RadarChart.MaxDomainValue;
+
+        maxValue = maxValue <= RadarChart.MinDomainValue
+            ? RadarChart.MinDomainValue
+            : RadarChart.MaxDomainValue;
+    }
+    
+    return d3ScaleLinear()
+        .domain([minValue, maxValue])
+        .range([RadarChart.MinDomainValue, radius]);
+}
 
     private renderLegend(): void {
         const radarChartData: IRadarChartData = this.radarChartData;
