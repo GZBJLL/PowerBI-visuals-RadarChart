@@ -146,6 +146,16 @@
                     "type": {
                         "enumeration": []
                     }
+                },
+                "useStaticScale": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "staticMaxValue": {
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },
